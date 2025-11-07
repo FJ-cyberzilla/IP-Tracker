@@ -12,24 +12,27 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 enable_testing()
 
 # --- 1. Dependency Finding ---
+# Find CURL and GTest. These steps are now proven to work with the CI fix.
 find_package(CURL REQUIRED)
 find_package(GTest REQUIRED) 
 
 # --- 2. Main Executable Target ---
 
-# Define the executable target FIRST.
+# Define the executable target first.
 add_executable(${PROJECT_NAME} src/ip_tracker.cpp)
 
-# Now apply includes and linking to the newly defined target.
+# Apply includes to the newly defined target.
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-# Link the executable against the necessary libraries
+# Link the executable against the necessary libraries.
+# FIX: Use the variable ${CURL_LIBRARIES} instead of the target CURL::CURL
+# to avoid target generation errors on some systems.
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-    CURL::CURL      # Link against libcurl
-    pthread         # For curl threading operations
+    ${CURL_LIBRARIES} # Links to the full path of libcurl found by find_package
+    pthread           # For curl threading operations
 )
 
 # --- 3. Unit Test Target ---
@@ -37,21 +40,14 @@ target_link_libraries(${PROJECT_NAME}
 # Define the test executable and specify its source file.
 add_executable(IPTrackerTests tests/unit_tests.cpp)
 
-# Apply include directories needed by the test (inheriting from the main project)
-# We use PRIVATE because the tests are the final consumer of these includes.
+# Apply include directories needed by the test.
 target_include_directories(IPTrackerTests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    src # Allows access to headers/files in src/ if needed
 )
 
-# Link the test executable with GTest. 
-# It does NOT link directly to IPTracker, but it links to the source files 
-# via the tests/unit_tests.cpp file which must contain or link to the tested code.
+# Link the test executable with GTest.
 target_link_libraries(IPTrackerTests 
     GTest::gtest_main  # Links with GTest framework
-    # Since we copied safe_get_string into unit_tests.cpp previously, 
-    # we don't need to link IPTracker. If we moved the function 
-    # to a library, we would link that library here.
 )
 
 # Define a CTest test that executes the test binary
