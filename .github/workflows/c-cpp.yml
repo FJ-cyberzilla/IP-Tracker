@@ -14,45 +14,46 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
       
-    - name: Install System Dependencies & Compile GTest 🛠️
+    - name: Install Dependencies & Compile GTest 🛠️
       run: |
+        # Update packages and install tools
         sudo apt-get update
-        # Install necessary tools: build-essential, cmake, libcurl (for cpr), and gtest source
         sudo apt-get install -y build-essential cmake libcurl4-openssl-dev libgtest-dev
-
-        echo "Compiling and installing GTest libraries to system path..."
         
-        # 1. Compile GTest from source (required because libgtest-dev only installs source files)
-        cd /usr/src/googletest
-        # Create a build directory for GTest compilation
-        sudo mkdir -p build
-        cd build
-        # Configure GTest
-        sudo cmake ..
-        # Compile GTest binaries
+        # --- ROBUST GTEST COMPILATION FIX ---
+        # 1. Define a temporary build directory for GTest
+        GTEST_BUILD_DIR=/tmp/gtest_build
+        sudo mkdir -p $GTEST_BUILD_DIR
+        
+        # 2. Compile GTest from the installed source (/usr/src/googletest/)
+        cd $GTEST_BUILD_DIR
+        sudo cmake /usr/src/googletest/
         sudo make
         
-        # 2. Copy compiled libraries to a path where CMake's FindGTest module can discover them
-        # Note: We use the system's standard library path.
+        # 3. Install the compiled GTest files to the standard library path
+        # This resolves the CMake 'missing' errors.
         sudo cp lib/libgtest*.a /usr/lib/x86_64-linux-gnu/
         
-        # Return to the root of your project repository
-        cd - 
-
-    # --- Configuration (This step will now succeed) ---
+        # 4. Return to the root of your project repository
+        cd $GITHUB_WORKSPACE
+        
     - name: Configure CMake
       run: |
+        # Create out-of-source build directory
         mkdir build
+        # Configure the project
         cmake -S . -B build
 
-    # --- Build, Test, and Artifact Steps remain the same ---
     - name: Compile Project
+      # Compile using all available CPU cores for maximum speed
       run: cmake --build build --config Release -- -j$(nproc)
 
     - name: Run Tests
+      # Execute tests using CTest
       run: ctest --test-dir build --output-on-failure || true
 
     - name: Install Final Executable
+      # Install the compiled output into a temporary directory
       run: cmake --install build --prefix ./install_dir
     
     - name: Upload Executable Artifact
