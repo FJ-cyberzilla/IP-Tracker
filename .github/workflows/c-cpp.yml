@@ -14,36 +14,45 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
       
-    # --- 1. Install Dependencies (Fix: Removed nlohmann-json-dev) ---
-    - name: Install System Dependencies
+    - name: Install System Dependencies & Compile GTest 🛠️
       run: |
         sudo apt-get update
-        # Install CMake and build tools
-        sudo apt-get install -y build-essential cmake
-        # Install libcurl development files, which is necessary for the 'cpr' library
-        sudo apt-get install -y libcurl4-openssl-dev
+        # Install necessary tools: build-essential, cmake, libcurl (for cpr), and gtest source
+        sudo apt-get install -y build-essential cmake libcurl4-openssl-dev libgtest-dev
 
-    # --- 2. Configure (Out-of-Source Build) ---
+        echo "Compiling and installing GTest libraries to system path..."
+        
+        # 1. Compile GTest from source (required because libgtest-dev only installs source files)
+        cd /usr/src/googletest
+        # Create a build directory for GTest compilation
+        sudo mkdir -p build
+        cd build
+        # Configure GTest
+        sudo cmake ..
+        # Compile GTest binaries
+        sudo make
+        
+        # 2. Copy compiled libraries to a path where CMake's FindGTest module can discover them
+        # Note: We use the system's standard library path.
+        sudo cp lib/libgtest*.a /usr/lib/x86_64-linux-gnu/
+        
+        # Return to the root of your project repository
+        cd - 
+
+    # --- Configuration (This step will now succeed) ---
     - name: Configure CMake
       run: |
-        # Create a build directory
         mkdir build
-        # Run CMake from within the build directory
         cmake -S . -B build
 
-    # --- 3. Build ---
+    # --- Build, Test, and Artifact Steps remain the same ---
     - name: Compile Project
-      # Compile using all available CPU cores for speed
       run: cmake --build build --config Release -- -j$(nproc)
 
-    # --- 4. Test (Placeholder for CTest) ---
-    - name: Run Tests (if applicable)
-      # This step requires you to define tests in CMake using 'add_test()'
+    - name: Run Tests
       run: ctest --test-dir build --output-on-failure || true
 
-    # --- 5. Install and Upload Artifacts ---
     - name: Install Final Executable
-      # Install the compiled output into a temporary directory
       run: cmake --install build --prefix ./install_dir
     
     - name: Upload Executable Artifact
