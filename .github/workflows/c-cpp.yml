@@ -1,0 +1,64 @@
+name: C/C++ CI with CMake
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    # Use a faster, more modern runner image
+    runs-on: ubuntu-22.04 
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      
+    # --- 1. Dependency Setup (Crucial for C/C++) ---
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        # Install basic tools like CMake, required compiler, and build essentials
+        sudo apt-get install -y build-essential cmake libcurl4-openssl-dev nlohmann-json-dev
+
+    # --- 2. Cache (For future speedup) ---
+    - name: Cache Compiler Dependencies (e.g., ccache)
+      uses: actions/cache@v4
+      with:
+        path: ~/.ccache
+        key: ${{ runner.os }}-ccache-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-
+
+    # --- 3. Configure (Best Practice: Out-of-Source Build) ---
+    - name: Create Build Directory
+      run: mkdir build
+    - name: Configure CMake
+      # Run configuration steps inside the 'build' directory
+      run: cmake ..
+      working-directory: build
+      
+    # --- 4. Build ---
+    - name: Compile Project
+      # Use the multi-core build flag (-j) for speed
+      run: cmake --build . -- -j$(nproc)
+      working-directory: build
+
+    # --- 5. Test (Equivalent to 'make check') ---
+    - name: Run Tests
+      # CTest is the standard testing tool for CMake
+      run: ctest --output-on-failure
+      working-directory: build
+
+    # --- 6. Package/Install (Optional but Recommended) ---
+    - name: Install Artifacts
+      # Installs the built files to a specified location (e.g., for distribution)
+      run: cmake --install . --prefix ./install_dir
+      working-directory: build
+      
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ip-tracker-linux-release
+        path: build/install_dir
