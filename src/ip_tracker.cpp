@@ -52,7 +52,7 @@ void print_banner() {
  * @param key The key to look up.
  * @return The string value or "N/A" if not found or null.
  */
-string safe_get_string(const json& j, const string& key) {
+string #include "utils.h"(const json& j, const string& key) {
     if (j.contains(key) && !j.at(key).is_null()) {
         if (j.at(key).is_string()) {
             return j.at(key).get<string>();
