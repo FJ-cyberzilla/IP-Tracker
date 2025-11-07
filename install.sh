@@ -22,6 +22,21 @@ echo -e "${GREEN}1. Installing System Dependencies...${NC}"
 # Note: nlohmann/json is header-only and is included in the project, so it's not installed via apt.
 sudo apt-get update
 sudo apt-get install -y build-essential cmake libcurl4-openssl-dev libgtest-dev
+# Link system-installed gtest for easier use with CMake
+# The -p flag ensures parent directories are created if needed
+if [ ! -f /usr/lib/x86_64-linux-gnu/libgtest.a ]; then
+    echo -e "${YELLOW}Compiling and linking gtest libraries...${NC}"
+    # Go to source directory
+    cd /usr/src/googletest
+    # Use cmake to generate build files for the GTest source
+    sudo cmake -DBUILD_GMOCK=OFF .
+    # Compile GTest
+    sudo make
+    # Copy the compiled libraries to the standard lib directory
+    sudo cp lib/libgtest*.a /usr/lib/x86_64-linux-gnu/
+    # Return to the original directory
+    cd - > /dev/null
+fi
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}Error: Failed to install system dependencies. Aborting.${NC}"
