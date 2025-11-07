@@ -18,20 +18,22 @@ jobs:
       run: |
         # Update packages and install tools
         sudo apt-get update
+        # Install build essentials, CMake, libcurl-dev, and libgtest-dev (source files)
         sudo apt-get install -y build-essential cmake libcurl4-openssl-dev libgtest-dev
         
-        # --- ROBUST GTEST COMPILATION FIX ---
-        # 1. Define a temporary build directory for GTest
+        echo "Compiling and installing GTest libraries to system path..."
+        
+        # 1. Define a temporary build directory for GTest compilation
         GTEST_BUILD_DIR=/tmp/gtest_build
         sudo mkdir -p $GTEST_BUILD_DIR
         
-        # 2. Compile GTest from the installed source (/usr/src/googletest/)
+        # 2. Compile GTest from the installed source
         cd $GTEST_BUILD_DIR
         sudo cmake /usr/src/googletest/
         sudo make
         
         # 3. Install the compiled GTest files to the standard library path
-        # This resolves the CMake 'missing' errors.
+        # This is the crucial step to resolve CMake's FindGTest error.
         sudo cp lib/libgtest*.a /usr/lib/x86_64-linux-gnu/
         
         # 4. Return to the root of your project repository
