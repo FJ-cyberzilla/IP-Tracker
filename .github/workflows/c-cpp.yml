@@ -1,7 +1,7 @@
 name: C/C++ CI
 
 permissions:
-  contents: read
+  contents: read and write 
 
 on:
   push:
