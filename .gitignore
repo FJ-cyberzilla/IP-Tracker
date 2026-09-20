@@ -110,3 +110,49 @@ conaninfo.txt
 *.bak
 *.swp
 *~
+
+
+# ==========================================
+# Build Outputs & CMake FetchContent
+# ==========================================
+# Ignores all compiled targets, build cache, and fetched dependencies (cpr, zlib)
+build/
+bin/
+out/
+
+# ==========================================
+# Object & Compiled Files
+# ==========================================
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+*.exe
+*.out
+a.out
+
+# ==========================================
+# IDE & Editor Specific Rules
+# ==========================================
+# VS Code
+.vscode/
+
+# CLion / JetBrains
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
+# Visual Studio
+.vs/
+*.user
+
+# ==========================================
+# System & Temporary Files
+# ==========================================
+.DS_Store
+*.swp
+*~
+*.log
