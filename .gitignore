@@ -1,158 +1,18 @@
-# ==========================================
-# C++ Standard .gitignore
-# ==========================================
-
-# --- Executables and Libraries ---
-*.exe
-*.out
-*.app
-*.bin
-*.elf
-
-# Static Libraries
-*.a
-*.lib
-
-# Shared Libraries / Dynamic Link Libraries
-*.so
-*.so.*
-*.dylib
-*.dll
-
-# --- Compiled Object Files ---
-*.o
-*.obj
-*.lo
-*.la
-
-# --- Build & Output Directories ---
+# Build artifacts
 build/
-Build/
-bin/
-Bin/
-out/
-Out/
-x64/
-x86/
-ARM/
-ARM64/
+*.o
+*.a
+*.so
+ip_tracker
 
-# --- CMake Generated Files ---
+# CMake
 CMakeCache.txt
 CMakeFiles/
-CMakeScripts/
-Testing/
-Makefile
 cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-*_artefacts/
+Makefile
+Testing/
 
-# --- Visual Studio / MSVC ---
-.vs/
-*.vcxproj.user
-*.vcxproj.filters
-*.sln.docstates
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
-*.sdf
-*.opensdf
-*.VC.db
-*.VC.VC.opendb
-Debug/
-Release/
-RelWithDebInfo/
-MinSizeRel/
-
-# --- Xcode / macOS ---
-.DS_Store
-*.xcodeproj/
-!*.xcodeproj/project.pbxproj
-*.xcworkspace/
-!*.xcworkspace/contents.xcworkmapping
-*.pbxuser
-*.mode1v3
-*.mode2v3
-*.perspectivev3
-*.xcuserdata/
-
-# --- IDEs & Code Editors ---
-# VS Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# CLion / JetBrains
-.idea/
-cmake-build-debug/
-cmake-build-release/
-
-# Eclipse
-.cproject
-.project
-.settings/
-
-# --- Package Managers & Dependencies ---
-vcpkg_installed/
-conan.lock
-conanbuildinfo.cmake
-conaninfo.txt
-
-# --- Logs & Temporary Files ---
-*.log
-*.tmp
-*.temp
-*.bak
-*.swp
-*~
-
-
-# ==========================================
-# Build Outputs & CMake FetchContent
-# ==========================================
-# Ignores all compiled targets, build cache, and fetched dependencies (cpr, zlib)
-build/
-bin/
-out/
-
-# ==========================================
-# Object & Compiled Files
-# ==========================================
-*.o
-*.obj
-*.so
-*.dylib
-*.dll
-*.a
-*.lib
-*.exe
-*.out
-a.out
-
-# ==========================================
-# IDE & Editor Specific Rules
-# ==========================================
-# VS Code
+# IDE / OS
 .vscode/
-
-# CLion / JetBrains
 .idea/
-cmake-build-debug/
-cmake-build-release/
-
-# Visual Studio
-.vs/
-*.user
-
-# ==========================================
-# System & Temporary Files
-# ==========================================
 .DS_Store
-*.swp
-*~
-*.log
