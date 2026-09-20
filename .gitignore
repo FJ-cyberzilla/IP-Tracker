@@ -1,0 +1,112 @@
+# ==========================================
+# C++ Standard .gitignore
+# ==========================================
+
+# --- Executables and Libraries ---
+*.exe
+*.out
+*.app
+*.bin
+*.elf
+
+# Static Libraries
+*.a
+*.lib
+
+# Shared Libraries / Dynamic Link Libraries
+*.so
+*.so.*
+*.dylib
+*.dll
+
+# --- Compiled Object Files ---
+*.o
+*.obj
+*.lo
+*.la
+
+# --- Build & Output Directories ---
+build/
+Build/
+bin/
+Bin/
+out/
+Out/
+x64/
+x86/
+ARM/
+ARM64/
+
+# --- CMake Generated Files ---
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+*_artefacts/
+
+# --- Visual Studio / MSVC ---
+.vs/
+*.vcxproj.user
+*.vcxproj.filters
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.VC.opendb
+Debug/
+Release/
+RelWithDebInfo/
+MinSizeRel/
+
+# --- Xcode / macOS ---
+.DS_Store
+*.xcodeproj/
+!*.xcodeproj/project.pbxproj
+*.xcworkspace/
+!*.xcworkspace/contents.xcworkmapping
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserdata/
+
+# --- IDEs & Code Editors ---
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# CLion / JetBrains
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
+# Eclipse
+.cproject
+.project
+.settings/
+
+# --- Package Managers & Dependencies ---
+vcpkg_installed/
+conan.lock
+conanbuildinfo.cmake
+conaninfo.txt
+
+# --- Logs & Temporary Files ---
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
