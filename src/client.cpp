@@ -1,41 +1,50 @@
-#include "ip_tracker/client.hpp"
-#include <cpr/cpr.h>
-#include <nlohmann/json.hpp>
+#include <curl/curl.h>
 #include <iostream>
+#include <utility>
+#include <string>
 
 namespace IPTracker {
 
-GeolocationClient::GeolocationClient(std::string api_key) : api_key_(std::move(api_key)) {}
+// Fallback declaration if header resolution fails
+class GeolocationClient {
+public:
+    explicit GeolocationClient(std::string apiKey = "");
+    std::string fetchIpData(const std::string& ip = "");
+private:
+    std::string apiKey_;
+};
 
-GeolocationData GeolocationClient::fetchIpData(const std::string& ip) {
-    std::string url = "https://api.ip2location.io/?key=" + api_key_ + "&ip=" + ip;
-    cpr::Response r = cpr::Get(cpr::Url{url});
+static size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) {
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
+}
 
-    GeolocationData data;
-    data.success = false;
-    data.ip = ip;
+GeolocationClient::GeolocationClient(std::string apiKey) : apiKey_(std::move(apiKey)) {}
 
-    if (r.status_code == 200) {
-        auto json = nlohmann::json::parse(r.text);
-        if (json.contains("country_name")) {
-            data.country = json.value("country_name", "N/A");
-            data.city = json.value("city_name", "N/A");
-            data.region = json.value("region_name", "N/A");
-            data.isp = json.value("isp", "N/A");
-            data.timezone = json.value("time_zone", "N/A");
-            data.latitude = json.value("latitude", 0.0); // Assuming numbers, need to handle or convert to string.
-            // Wait, JSON can be double or string. 
-            // The previous safe_get_string handled this.
-            // I should use that or similar.
-            data.latitude = std::to_string(json.value("latitude", 0.0));
-            data.longitude = std::to_string(json.value("longitude", 0.0));
-            data.is_proxy = json.value("is_proxy", 0) == 1;
-            data.success = true;
+std::string GeolocationClient::fetchIpData(const std::string& ip) {
+    CURL* curl = curl_easy_init();
+    std::string readBuffer;
+
+    if (curl) {
+        std::string url = "https://ipinfo.io/" + (ip.empty() ? "" : ip + "/") + "json";
+        if (!apiKey_.empty()) {
+            url += "?token=" + apiKey_;
         }
-    } else {
-        std::cerr << "Error fetching data: " << r.error.message << std::endl;
+
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "IPTracker/1.0");
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+
+        CURLcode res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+        }
+
+        curl_easy_cleanup(curl);
     }
-    return data;
+    return readBuffer;
 }
 
-}
+} // namespace IPTracker
